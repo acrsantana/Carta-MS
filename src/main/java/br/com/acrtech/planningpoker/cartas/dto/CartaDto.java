@@ -1,7 +1,6 @@
 package br.com.acrtech.planningpoker.cartas.dto;
 
 import br.com.acrtech.planningpoker.cartas.model.Carta;
-import br.com.acrtech.planningpoker.cartas.model.Organizacao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,8 @@ public class CartaDto implements Serializable {
     @NotNull
     private String valor;
     @NotNull
-    private Organizacao organizacao;
+    private Integer idOrganizacao;
+    private String organizacao;
 
     public CartaDto(Carta carta) {
         BeanUtils.copyProperties(carta, this);

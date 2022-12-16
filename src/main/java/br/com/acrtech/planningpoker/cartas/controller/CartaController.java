@@ -1,8 +1,7 @@
 package br.com.acrtech.planningpoker.cartas.controller;
 
 import br.com.acrtech.planningpoker.cartas.dto.CartaDto;
-import br.com.acrtech.planningpoker.cartas.exception.CartaNaoEncontradaException;
-import br.com.acrtech.planningpoker.cartas.model.Organizacao;
+import br.com.acrtech.planningpoker.cartas.exception.*;
 import br.com.acrtech.planningpoker.cartas.service.CartaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,7 @@ public class CartaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    public ResponseEntity<CartaDto> findById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(cartaService.findById(id));
         } catch (CartaNaoEncontradaException e) {
@@ -40,9 +39,13 @@ public class CartaController {
 
     }
 
-    @GetMapping("/organizacao/{organizacao}")
-    public ResponseEntity<List<CartaDto>> findAllByOrganizacao(@PathVariable Organizacao organizacao){
-        return ResponseEntity.ok(cartaService.findAllByOrganizacao(organizacao));
+    @GetMapping("/organizacao/{idOrganizacao}")
+    public ResponseEntity<List<CartaDto>> findAllByOrganizacao(@PathVariable Integer idOrganizacao){
+        try {
+            return ResponseEntity.ok(cartaService.findAllByOrganizacao(idOrganizacao));
+        } catch (ErroAoRecuperarCartasException e) {
+            throw new ErroAoRecuperarCartasException(e.getMessage());
+        }
     }
 
     @PostMapping
@@ -52,18 +55,22 @@ public class CartaController {
 
     @PostMapping("/todas")
     public ResponseEntity<List<CartaDto>> saveAll(@RequestBody @Valid List<CartaDto> cartas) {
-        return ResponseEntity.ok(cartaService.saveAll(cartas));
+        try {
+            return ResponseEntity.ok(cartaService.saveAll(cartas));
+        } catch (OrganizacaoNaoEncontradaException | CartaNaoInformadaException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (ErroAoSalvarCartasException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         cartaService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/organizacao/{organizacao}")
-    public ResponseEntity<HttpStatus> deleteByOrganizacao(@PathVariable Organizacao organizacao) {
+    public void deleteByOrganizacao(@PathVariable Integer organizacao) {
         cartaService.deleteAllByOrganizacao(organizacao);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

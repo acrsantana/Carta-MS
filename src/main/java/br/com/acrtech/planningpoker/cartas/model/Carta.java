@@ -9,8 +9,6 @@ import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,8 +22,8 @@ public class Carta {
     @Column(nullable = false)
     private Float esforco;
     private String valor;
-    @Enumerated(EnumType.STRING)
-    private Organizacao organizacao;
+    @Column(nullable = false)
+    private Integer idOrganizacao;
 
     public Carta(CartaDto carta) {
         BeanUtils.copyProperties(carta, this);
