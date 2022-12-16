@@ -1,7 +1,11 @@
 package br.com.acrtech.planningpoker.cartas.controller;
 
 import br.com.acrtech.planningpoker.cartas.dto.CartaDto;
-import br.com.acrtech.planningpoker.cartas.exception.*;
+import br.com.acrtech.planningpoker.cartas.exception.CartaNaoEncontradaException;
+import br.com.acrtech.planningpoker.cartas.exception.CartaNaoInformadaException;
+import br.com.acrtech.planningpoker.cartas.exception.ErroAoRecuperarCartasException;
+import br.com.acrtech.planningpoker.cartas.exception.ErroAoSalvarCartasException;
+import br.com.acrtech.planningpoker.cartas.exception.OrganizacaoNaoEncontradaException;
 import br.com.acrtech.planningpoker.cartas.service.CartaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
