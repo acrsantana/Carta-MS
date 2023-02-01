@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class CartaController {
@@ -34,7 +35,7 @@ public class CartaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CartaDto> findById(@PathVariable Long id) {
+    public ResponseEntity<CartaDto> findById(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(cartaService.findById(id));
         } catch (CartaNaoEncontradaException e) {
@@ -69,7 +70,7 @@ public class CartaController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable UUID id) {
         cartaService.delete(id);
     }
 

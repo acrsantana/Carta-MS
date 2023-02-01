@@ -4,8 +4,9 @@ import br.com.acrtech.planningpoker.cartas.dto.CartaDto;
 import br.com.acrtech.planningpoker.cartas.exception.*;
 import br.com.acrtech.planningpoker.cartas.http.OrganizacaoClient;
 import br.com.acrtech.planningpoker.cartas.model.Carta;
-import br.com.acrtech.planningpoker.cartas.model.Organizacao;
+import br.com.acrtech.planningpoker.cartas.dto.OrganizacaoDto;
 import br.com.acrtech.planningpoker.cartas.repository.CartaRepository;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service @Slf4j
 public class CartaService {
@@ -28,32 +30,34 @@ public class CartaService {
     public List<CartaDto> findAll(){
         log.info("Buscando todas as cartas");
         List<CartaDto> cartasDto = cartaRepository.findAll().stream().map(CartaDto::new).toList();
+        System.out.println(cartasDto);
         if (cartasDto.isEmpty()){
             log.error("Nenhuma carta encontrada");
             throw new CartaNaoEncontradaException("Nenhuma carta encontrada");
         }
+//        List<OrganizacaoDto> organizacoes = organizacaoClient.findAll();
         try {
             log.debug("Buscando todas as organizações no microserviço");
-            List<Organizacao> organizacoes = organizacaoClient.findAll();
+            List<OrganizacaoDto> organizacoes = organizacaoClient.findAll();
             if (organizacoes.isEmpty()){
                 log.error("Nenhuma organização encontrada");
                 throw new OrganizacaoNaoEncontradaException("Nenhuma organizacao encontrada");
             }
-            cartasDto.forEach(carta -> organizacoes.forEach(organizacao -> {
-                if (carta.getIdOrganizacao().equals(organizacao.getId())){
-                    log.debug("Associando a carta {} a organização {}", carta.getValor(), organizacao.getNome());
-                    carta.setOrganizacao(organizacao.getNome());
+            cartasDto.forEach(carta -> organizacoes.forEach(organizacaoDto -> {
+                if (carta.getIdOrganizacao().equals(organizacaoDto.getId())){
+                    log.debug("Associando a carta {} a organização {}", carta.getValor(), organizacaoDto.getNome());
+                    carta.setOrganizacao(organizacaoDto.getNome());
                 }
             }));
             return cartasDto;
-        } catch (Exception e) {
+        } catch (FeignException e) {
             log.error("Não foi possível buscar a lista de cartas");
             throw new ErroAoRecuperarCartasException("Não foi possível buscar a lista de cartas");
         }
 
     }
 
-    public CartaDto findById(Long id) {
+    public CartaDto findById(UUID id) {
         log.info("Buscando a carta com id {}", id);
         Optional<Carta> optionalCarta = cartaRepository.findById(id);
         if (optionalCarta.isEmpty()){
@@ -104,7 +108,7 @@ public class CartaService {
     public List<CartaDto> saveAll(List<CartaDto> cartas) {
         log.info("Salvando lista de cartas com {} cartas", cartas.size());
         try {
-            List<Organizacao> organizacoes = organizacaoClient.findAll();
+            List<OrganizacaoDto> organizacoes = organizacaoClient.findAll();
             if (organizacoes.isEmpty()){
                 log.error("Nenhuma organização encontrada");
                 throw new OrganizacaoNaoEncontradaException("Nenhuma organização encontrada");
@@ -116,9 +120,9 @@ public class CartaService {
             }
 
             cartas.forEach(carta -> {
-                organizacoes.forEach(organizacao -> {
-                    if (carta.getIdOrganizacao().equals(organizacao.getId())){
-                        carta.setOrganizacao(organizacao.getNome());
+                organizacoes.forEach(organizacaoDto -> {
+                    if (carta.getIdOrganizacao().equals(organizacaoDto.getId())){
+                        carta.setOrganizacao(organizacaoDto.getNome());
                     }
                 });
                 if (Objects.isNull(carta.getOrganizacao())){
@@ -130,9 +134,9 @@ public class CartaService {
             List<Carta> list = cartaRepository.saveAll(cartas.stream().map(Carta::new).toList());
             List<CartaDto> dtos = list.stream().map(CartaDto::new).toList();
             dtos.forEach(carta -> {
-                organizacoes.forEach(organizacao -> {
-                    if (carta.getIdOrganizacao().equals(organizacao.getId())) {
-                        carta.setOrganizacao(organizacao.getNome());
+                organizacoes.forEach(organizacaoDto -> {
+                    if (carta.getIdOrganizacao().equals(organizacaoDto.getId())) {
+                        carta.setOrganizacao(organizacaoDto.getNome());
                     }
                 });
             });
@@ -148,7 +152,7 @@ public class CartaService {
 
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         log.info("Deletando a carta com id {}", id);
         cartaRepository.deleteById(id);
     }

@@ -9,10 +9,11 @@ import org.springframework.beans.BeanUtils;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data @NoArgsConstructor @AllArgsConstructor
 public class CartaDto implements Serializable {
-    private Long id;
+    private UUID id;
     @NotNull @Positive(message = "Esforço não pode ser negativo")
     private Float esforco;
     @NotNull

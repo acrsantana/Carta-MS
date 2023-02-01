@@ -1,4 +1,4 @@
-package br.com.acrtech.planningpoker.cartas.model;
+package br.com.acrtech.planningpoker.cartas.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,11 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity @Table(name = "organizacoes")
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class Organizacao {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class OrganizacaoDto {
     private Integer id;
-    @Column(nullable = false, unique = true)
     private String nome;
 }
